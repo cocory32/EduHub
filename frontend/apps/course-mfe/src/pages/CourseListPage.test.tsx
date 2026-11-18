@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { useCourses } from '../hooks/useCourses';
 import { CourseListPage } from './CourseListPage';
 
@@ -30,4 +30,18 @@ test('불러오기에 실패하면 에러 메시지를 보여 준다', () => {
   render(<CourseListPage />);
 
   expect(screen.getByRole('alert')).toHaveTextContent('과정 목록을 불러오지 못했습니다.');
+});
+
+test('과정 행을 누르면 onSelect에 과정 id를 넘긴다', () => {
+  mockUseCourses.mockReturnValue({
+    data: { content: [{ id: 3, title: 'JPA 실전', category: 'BACKEND', status: 'OPEN', sessionCount: 1 }], page: 0, size: 10, totalElements: 1 },
+    loading: false,
+    error: undefined,
+  });
+  const onSelect = jest.fn();
+
+  render(<CourseListPage onSelect={onSelect} />);
+  fireEvent.click(screen.getByText('JPA 실전'));
+
+  expect(onSelect).toHaveBeenCalledWith(3);
 });

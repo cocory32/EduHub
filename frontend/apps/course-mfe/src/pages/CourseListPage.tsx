@@ -17,8 +17,13 @@ import { useCourses } from '../hooks/useCourses';
 const PAGE_SIZE = 10;
 const CATEGORIES = ['', 'BACKEND', 'FRONTEND'];
 
+export interface CourseListPageProps {
+  /** 과정 행을 누르면 그 과정 id로 부른다 (상세 화면 FR-02로 이동) */
+  onSelect?: (courseId: number) => void;
+}
+
 /** 과정 목록 화면 (FR-01). 데이터는 useCourses만 쓰고 courseApi를 직접 부르지 않는다. */
-export function CourseListPage() {
+export function CourseListPage({ onSelect }: CourseListPageProps = {}) {
   const [keyword, setKeyword] = useState('');
   const [category, setCategory] = useState('');
   const [page, setPage] = useState(0); // MUI TablePagination도 0부터 시작
@@ -67,7 +72,12 @@ export function CourseListPage() {
           </TableHead>
           <TableBody>
             {data?.content?.map((c) => (
-              <TableRow key={c.id}>
+              <TableRow
+                key={c.id}
+                hover={!!onSelect}
+                onClick={onSelect && c.id !== undefined ? () => onSelect(c.id!) : undefined}
+                sx={onSelect ? { cursor: 'pointer' } : undefined}
+              >
                 <TableCell>{c.title}</TableCell>
                 <TableCell>{c.category}</TableCell>
                 <TableCell>{c.sessionCount}</TableCell>
