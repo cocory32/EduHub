@@ -1,6 +1,6 @@
 ---
 name: eduhub-api
-description: EduHub 백엔드에 API나 엔드포인트를 추가·변경하거나 새 백엔드 기능을 만들 때 쓰는 절차. 마이그레이션부터 엔티티, DTO, Repository, Service, Controller, 테스트, 프론트 클라이언트 재생성까지 순서와 규칙을 안내한다.
+description: EduHub 백엔드에 REST API를 추가하거나 바꿀 때 쓰는 팀 절차. 새 엔드포인트 추가, 기존 API의 요청·응답·상태 코드 변경, 새 기능(FR)의 백엔드 구현, 테이블·엔티티·DTO 추가처럼 backend/의 Controller·Service·Repository를 건드리는 작업이면 시작 전에 읽는다. 프론트 화면만 바꾸는 작업에는 쓰지 않는다.
 ---
 
 # EduHub API 추가 절차
