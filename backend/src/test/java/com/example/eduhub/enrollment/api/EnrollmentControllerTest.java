@@ -1,14 +1,16 @@
 package com.example.eduhub.enrollment.api;
 
 import static org.mockito.BDDMockito.given;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.example.eduhub.enrollment.api.dto.EnrollmentResponse;
 import com.example.eduhub.enrollment.application.EnrollmentService;
-import com.example.eduhub.enrollment.domain.DuplicateEnrollmentException;
-import com.example.eduhub.enrollment.domain.SessionFullException;
+import com.example.eduhub.enrollment.domain.CancelDeadlinePassedException;
+import com.example.eduhub.enrollment.domain.EnrollmentAccessDeniedException;
+import com.example.eduhub.enrollment.domain.WaitlistFullException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,16 +30,16 @@ class EnrollmentControllerTest {
   @MockitoBean private EnrollmentService enrollmentService;
 
   @Test
-  @DisplayName("신청하면 201과 CONFIRMED")
-  void enroll_returns201() throws Exception {
+  @DisplayName("정원이 찬 회차에 신청하면 201과 대기 순번을 돌려준다")
+  void enroll_waiting_returns201() throws Exception {
     given(enrollmentService.enroll(10L, 1L))
-        .willReturn(new EnrollmentResponse(100L, 10L, "CONFIRMED"));
+        .willReturn(new EnrollmentResponse(100L, 10L, "WAITING", 3));
 
     mockMvc
         .perform(post("/api/v1/sessions/10/enrollments").header(HEADER, "1"))
         .andExpect(status().isCreated())
-        .andExpect(jsonPath("$.id").value(100))
-        .andExpect(jsonPath("$.status").value("CONFIRMED"));
+        .andExpect(jsonPath("$.status").value("WAITING"))
+        .andExpect(jsonPath("$.waitingNumber").value(3));
   }
 
   @Test
@@ -50,24 +52,59 @@ class EnrollmentControllerTest {
   }
 
   @Test
-  @DisplayName("중복 신청이면 409 DUPLICATE_ENROLLMENT")
-  void enroll_duplicate_returns409() throws Exception {
-    given(enrollmentService.enroll(10L, 1L)).willThrow(new DuplicateEnrollmentException(10L));
+  @DisplayName("대기 인원까지 찼으면 409 WAITLIST_FULL")
+  void enroll_waitlistFull_returns409() throws Exception {
+    given(enrollmentService.enroll(10L, 1L)).willThrow(new WaitlistFullException(10L));
 
     mockMvc
         .perform(post("/api/v1/sessions/10/enrollments").header(HEADER, "1"))
         .andExpect(status().isConflict())
-        .andExpect(jsonPath("$.code").value("DUPLICATE_ENROLLMENT"));
+        .andExpect(jsonPath("$.code").value("WAITLIST_FULL"));
   }
 
   @Test
-  @DisplayName("정원이 찼으면 409 SESSION_FULL")
-  void enroll_full_returns409() throws Exception {
-    given(enrollmentService.enroll(10L, 1L)).willThrow(new SessionFullException(10L));
+  @DisplayName("신청 조회는 현재 대기 순번을 돌려준다")
+  void get_returnsWaitingNumber() throws Exception {
+    given(enrollmentService.get(100L, 1L))
+        .willReturn(new EnrollmentResponse(100L, 10L, "WAITING", 1));
 
     mockMvc
-        .perform(post("/api/v1/sessions/10/enrollments").header(HEADER, "1"))
+        .perform(get("/api/v1/enrollments/100").header(HEADER, "1"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.waitingNumber").value(1));
+  }
+
+  @Test
+  @DisplayName("취소하면 200과 CANCELED")
+  void cancel_returns200() throws Exception {
+    given(enrollmentService.cancel(100L, 1L))
+        .willReturn(new EnrollmentResponse(100L, 10L, "CANCELED", null));
+
+    mockMvc
+        .perform(post("/api/v1/enrollments/100/cancel").header(HEADER, "1"))
+        .andExpect(status().isOk())
+        .andExpect(jsonPath("$.status").value("CANCELED"));
+  }
+
+  @Test
+  @DisplayName("다른 사람 신청을 취소하면 403")
+  void cancel_notOwner_returns403() throws Exception {
+    given(enrollmentService.cancel(100L, 2L)).willThrow(new EnrollmentAccessDeniedException(100L));
+
+    mockMvc
+        .perform(post("/api/v1/enrollments/100/cancel").header(HEADER, "2"))
+        .andExpect(status().isForbidden())
+        .andExpect(jsonPath("$.code").value("ENROLLMENT_FORBIDDEN"));
+  }
+
+  @Test
+  @DisplayName("취소 기한이 지나면 409 CANCEL_DEADLINE_PASSED")
+  void cancel_deadlinePassed_returns409() throws Exception {
+    given(enrollmentService.cancel(100L, 1L)).willThrow(new CancelDeadlinePassedException(100L));
+
+    mockMvc
+        .perform(post("/api/v1/enrollments/100/cancel").header(HEADER, "1"))
         .andExpect(status().isConflict())
-        .andExpect(jsonPath("$.code").value("SESSION_FULL"));
+        .andExpect(jsonPath("$.code").value("CANCEL_DEADLINE_PASSED"));
   }
 }
