@@ -41,3 +41,8 @@ ehthumbs.db
 .env
 .env.*
 !.env.example
+
+# ===== Claude Code (개인 설정) =====
+# 팀 공유: .claude/settings.json, skills, agents (커밋)
+.claude/settings.local.json
+.claude/launch.json
