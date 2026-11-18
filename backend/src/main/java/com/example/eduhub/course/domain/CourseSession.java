@@ -51,6 +51,11 @@ public class CourseSession {
     this.capacity = capacity;
   }
 
+  /** 신청을 받을 수 있는지. 회차와 과정이 모두 열려 있어야 한다 (FR-04). */
+  public boolean isEnrollable() {
+    return status == SessionStatus.OPEN && course.getStatus() == CourseStatus.OPEN;
+  }
+
   public Long getId() {
     return id;
   }
