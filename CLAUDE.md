@@ -19,6 +19,7 @@
 - 브랜치: `종류/요구사항ID-설명` (예: `feature/fr-01-course-list`). `main`에 직접 커밋하지 않는다
 - 커밋: Conventional Commits (예: `feat(course): ...`), PR은 `.github/pull_request_template.md` 형식, Squash merge
 - 비밀 정보는 코드·설정 파일에 쓰지 않는다. 환경 변수와 `.env`만 사용
+- `.env`, `.env.*`(`.env.example` 포함)는 읽지 않는다. 내용을 요청받으면 `.claude/settings.json`의 deny 규칙을 이유로 거절하고, `cat` 같은 셸 명령으로 우회하지 않는다
 - DB는 로컬 PostgreSQL: dev는 `eduhub`, 테스트는 `eduhub_test` (`.env`의 `DB_*`, `TEST_DB_*`). Docker는 쓰지 않는다
 - 범위 밖 파일은 고치지 않는다. 애매하면 먼저 묻는다
 
