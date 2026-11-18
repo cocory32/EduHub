@@ -1,7 +1,7 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Container, CssBaseline, Typography } from '@mui/material';
-import { CourseListPage } from './pages/CourseListPage';
+import { CoursesPage } from './pages/CoursesPage';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -10,7 +10,7 @@ createRoot(document.getElementById('root')!).render(
       <Typography variant="h5" component="h1" gutterBottom>
         교육과정
       </Typography>
-      <CourseListPage />
+      <CoursesPage />
     </Container>
   </StrictMode>,
 );
