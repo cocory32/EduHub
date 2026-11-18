@@ -1,0 +1,4 @@
+# gradlew는 Windows에서 체크아웃해도 LF를 유지해야 Git Bash에서 실행된다.
+gradlew text eol=lf
+*.sh text eol=lf
+*.bat text eol=crlf

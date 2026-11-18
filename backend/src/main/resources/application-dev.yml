@@ -1,0 +1,7 @@
+# 로컬 개발용. NFR-03: 접속 정보는 저장소에 두지 않고 환경 변수로만 받는다.
+# 필요한 변수 이름은 저장소 루트의 .env.example 참고.
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}

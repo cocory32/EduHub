@@ -1,0 +1,15 @@
+api.ts
+base.ts
+common.ts
+configuration.ts
+docs/CourseApi.md
+docs/CourseDetailResponse.md
+docs/CourseRequest.md
+docs/CourseSummaryResponse.md
+docs/ErrorResponse.md
+docs/HealthApi.md
+docs/HealthResponse.md
+docs/PageResponseCourseSummaryResponse.md
+docs/SessionRequest.md
+docs/SessionResponse.md
+index.ts

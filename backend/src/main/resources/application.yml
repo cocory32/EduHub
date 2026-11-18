@@ -1,0 +1,26 @@
+# 모든 환경에 공통인 설정. 환경별 값은 application-{profile}.yml에 둔다.
+spring:
+  application:
+    name: eduhub
+  config:
+    # 저장소 루트의 .env를 읽는다 (backend 폴더에서 실행 기준). 없으면 OS 환경 변수만 쓴다.
+    # NFR-03: .env는 .gitignore로 커밋되지 않는다.
+    import: optional:file:../.env[.properties]
+  profiles:
+    # 프로필을 지정하지 않고 실행하면 dev로 뜬다. 테스트는 @ActiveProfiles("test")를 쓴다.
+    default: dev
+  jpa:
+    # NFR-02: 뷰 렌더링 중 지연 로딩으로 생기는 숨은 쿼리를 막는다.
+    open-in-view: false
+    hibernate:
+      # NFR-06: 스키마는 Flyway 마이그레이션으로만 바꾼다. Hibernate는 검증만 한다.
+      ddl-auto: validate
+  flyway:
+    locations: classpath:db/migration
+
+# NFR-04: OpenAPI 스펙과 Swagger UI 경로
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
